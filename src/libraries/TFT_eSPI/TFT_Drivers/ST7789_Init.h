@@ -61,6 +61,8 @@
   writedata(0xa1);
 
   //--------------------------------ST7789V gamma setting---------------------------------------//
+  //#define ORIG_GAMMA
+  #ifdef ORIG_GAMMA
   writecommand(ST7789_PVGAMCTRL);
   writedata(0xd0);
   writedata(0x00);
@@ -92,8 +94,106 @@
   writedata(0x17);
   writedata(0x1b);
   writedata(0x1e);
+  #else
+
+  writecommand(ST7789_PVGAMCTRL);
+writedata(0xF8);
+writedata(0x0A);
+writedata(0x0E);
+writedata(0x0E);
+writedata(0x0E);
+writedata(0x28);
+writedata(0x36);
+writedata(0x33);
+writedata(0x53);
+writedata(0x0E);
+writedata(0x1C);
+writedata(0x1A);
+writedata(0x34);
+writedata(0x38);
+
+writecommand(ST7789_NVGAMCTRL);
+writedata(0xF8);
+writedata(0x0A);
+writedata(0x0E);
+writedata(0x0E);
+writedata(0x0E);
+writedata(0x28);
+writedata(0x36);
+writedata(0x33);
+writedata(0x53);
+writedata(0x0E);
+writedata(0x1C);
+writedata(0x1A);
+writedata(0x34);
+writedata(0x38);
+#endif
+
+#if 0
+  writecommand(ST7789_PVGAMCTRL);
+  writedata(0xD8);
+  writedata(0x0A);
+  writedata(0x0E);
+  writedata(0x0E);
+  writedata(0x0E);
+  writedata(0x28);
+  writedata(0x32);
+  writedata(0x44);
+  writedata(0x48);
+  writedata(0x0E);
+  writedata(0x1C);
+  writedata(0x1A);
+  writedata(0x24);
+  writedata(0x28);
+
+  writecommand(ST7789_NVGAMCTRL);
+  writedata(0xD8);
+  writedata(0x0A);
+  writedata(0x0E);
+  writedata(0x0E);
+  writedata(0x0E);
+  writedata(0x28);
+  writedata(0x32);
+  writedata(0x44);
+  writedata(0x48);
+  writedata(0x0E);
+  writedata(0x1C);
+  writedata(0x1A);
+  writedata(0x24);
+  writedata(0x28);
+#endif
+
+
+  writecommand(ST7789_DGMEN); // Digital gamma enable
+  writedata(0x04); // on
+  //writedata(0x0); // off
+
+  writecommand(ST7789_DGMLUTR); // Digital Gamma lookup table for Red (64 entries)
+  for (int i = 0; i < 64; i++) {
+    float max_red_out = 63.0;
+    float red_gamma_adjust = 1.0;
+    int8_t red_gamma = round( pow(float(i)/63.0, red_gamma_adjust) * max_red_out);
+    writedata(((red_gamma << 2) + 3) & 0xFF);
+    //writedata(0x00);
+  }
+
+  writecommand(ST7789_DGMLUTB); // Digital Gamma lookup table for Blue (64 entries)
+  for (int i = 0; i < 64; i++) {
+    float max_blue_out = 56.0;
+    float blue_gamma_adjust = 1.0;
+    int8_t blue_gamma = round( pow(float(i)/63.0, blue_gamma_adjust) * max_blue_out);
+    writedata(((blue_gamma << 2) + 3) & 0xFF);
+  }
+  
+
+  writecommand(ST7789_GAMSET);
+  writedata(0x01); // 2.2
+  //writedata(0x02); // 1.8
+  //writedata(0x03); // 2.5
+  //writedata(0x04); // 1.0
 
   writecommand(ST7789_INVON);
+  //writecommand(ST7789_INVOFF);
 
   writecommand(ST7789_CASET);    // Column address set
   writedata(0x00);
